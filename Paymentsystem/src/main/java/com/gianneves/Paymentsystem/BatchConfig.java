@@ -9,8 +9,12 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.item.file.transform.Range;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -39,6 +43,26 @@ public class BatchConfig {
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
+                .build();
+    }
+
+    @Bean
+    FlatFileItemReader<TransactionCNAB> reader() {
+        return new FlatFileItemReaderBuilder<TransactionCNAB>()
+                .name("reader")
+                .resource(new FileSystemResource("files/CNAB.txt"))
+                .fixedLength()
+                .columns(
+                        new Range(1, 1), new Range(2, 9),
+                        new Range(10, 19), new Range(20, 30),
+                        new Range(31, 42), new Range(43, 48),
+                        new Range(49, 62), new Range(63, 80)
+                )
+                .names(
+                        "type", "date", "value", "cpf",
+                        "card", "hour", "ownerShop", "shopName"
+                )
+                .targetType(TransactionCNAB.class)
                 .build();
     }
 }
