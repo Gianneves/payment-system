@@ -1,0 +1,6 @@
+2023-11-09 11:16:15 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE IF NOT EXISTS transaction ( id SERIAL primary key, type int, date date, [*]value decimal, cpf bigint, card varchar(255), hour time, owner_shop varchar(255), shop_name varchar(155) )"; expected "identifier"; SQL statement:
+CREATE TABLE IF NOT EXISTS transaction ( id SERIAL primary key, type int, date date, value decimal, cpf bigint, card varchar(255), hour time, owner_shop varchar(255), shop_name varchar(155) ) [42001-214]
+2023-11-09 11:16:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE IF NOT EXISTS transaction ( id SERIAL primary key, type int, date date, [*]value decimal, cpf bigint, card varchar(255), hour time, owner_shop varchar(255), shop_name varchar(155) )"; expected "identifier"; SQL statement:
+CREATE TABLE IF NOT EXISTS transaction ( id SERIAL primary key, type int, date date, value decimal, cpf bigint, card varchar(255), hour time, owner_shop varchar(255), shop_name varchar(155) ) [42001-214]

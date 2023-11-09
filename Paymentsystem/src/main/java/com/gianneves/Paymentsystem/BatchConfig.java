@@ -9,6 +9,8 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.transform.Range;
@@ -16,6 +18,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
+import java.math.BigDecimal;
 
 @Configuration
 public class BatchConfig {
@@ -63,6 +68,40 @@ public class BatchConfig {
                         "card", "hour", "ownerShop", "shopName"
                 )
                 .targetType(TransactionCNAB.class)
+                .build();
+    }
+
+    @Bean
+    ItemProcessor<TransactionCNAB, Transaction> processor() {
+        return item -> {
+            var transaction = new Transaction(
+                    null, item.type(), null, null, item.cpf(),
+                    item.card(), null, item.ownerShop().trim(),
+                    item.shopName().trim())
+                    .withValue(
+                            item.value().divide(BigDecimal.valueOf(100)))
+                    .withDate(item.date())
+                    .withHour(item.hour());
+
+            return transaction;
+        };
+    }
+
+    @Bean
+    JdbcBatchItemWriter<Transaction> writer(DataSource dataSource) {
+        return new JdbcBatchItemWriterBuilder<Transaction>()
+                .dataSource(dataSource)
+                .sql(
+                        """
+                        INSERT INTO transaction (
+                            type, date, value, cpf, card,
+                            hour, owner_shop, shop_name
+                        ) VALUES (
+                            :type, :date, :value, :cpf, :card,
+                            :hour, :ownerShop, : shopName
+                        )       
+                         """)
+                .beanMapped()
                 .build();
     }
 }
